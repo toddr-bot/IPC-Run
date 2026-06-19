@@ -2034,6 +2034,8 @@ sub harness {
                       if Win32_MODE && ref eq "CODE";
                     croak "Can't run undefined command. Did you pass a reference to an undefined array?"
                       if ref eq 'ARRAY' && @$_ && !defined( $_->[0] );
+                    croak "Command name must be a string, not a " . ref( $_->[0] ) . " reference"
+                      if ref eq 'ARRAY' && @$_ && ref $_->[0];
                     $cur_kid = {
                         TYPE   => 'cmd',
                         VAL    => $_,
@@ -3989,10 +3991,12 @@ or
 Returns undef if no child processes were spawned and no child number was
 specified.  Throws an exception if an out-of-range child number is passed.
 
-Note that C<result> returns C<undef> both when no children have exited and
-when all children exited with a zero exit code.  Use L</finished> to
-determine whether the harness has actually completed, or use L</results> to
-get the exit codes of all children (including zeros).
+Note that C<result> returns C<undef> when no children were spawned, when
+all children exited with a zero exit code, or when a child was killed by a
+signal (since C<$? E<gt>E<gt> 8> is 0 for signal deaths).  Use L</finished>
+to determine whether the harness has actually completed, L</full_result>
+to detect signal deaths, or L</results> to get the exit codes of all
+children (including zeros).
 
 =cut
 

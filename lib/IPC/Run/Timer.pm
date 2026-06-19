@@ -40,7 +40,7 @@ exception on expiration so you don't need to check them:
 
    $in = "some stimulus";
    $out = '';
-   $t->time( 5 )
+   $t->interval( 5 );
    pump $h until $out =~ /expected response/;
 
 You do need to check timers:
@@ -55,7 +55,7 @@ You do need to check timers:
 
    $in = "some stimulus";
    $out = '';
-   $t->time( 5 )
+   $t->interval( 5 );
    pump $h until $out =~ /expected response/ || $t->is_expired;
 
 Timers and timeouts that are reset get started by start() and
@@ -661,8 +661,6 @@ sub state {
 =head1 TODO
 
 use Time::HiRes; if it's present.
-
-Add detection and parsing of [[[HH:]MM:]SS formatted times and intervals.
 
 =head1 AUTHOR
 

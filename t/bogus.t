@@ -21,7 +21,7 @@ BEGIN {
     }
 }
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 use IPC::Run qw( run start );
 
 SCOPE: {
@@ -64,6 +64,29 @@ SCOPE: {
     eval { run \@cmd };
     my $got = $@ =~ $expected ? $expected : $@ || "";
     is( $got, $expected, "run with sparse array (undef first element) croaks at harness parse time" );
+}
+
+# Test that passing a nested arrayref (e.g. [[cmd]]) gives a clear error
+# instead of the cryptic "Command 'ARRAY(0x...)' not found".
+SCOPE: {
+    my $expected = 'must be a string, not a ARRAY';
+    eval { run [[qw(echo hello)]] };
+    my $got = $@ =~ $expected ? $expected : $@ || "";
+    is( $got, $expected, "run [[cmd]] croaks with clear reference error" );
+}
+
+SCOPE: {
+    my $expected = 'must be a string, not a HASH';
+    eval { run [{ cmd => 1 }] };
+    my $got = $@ =~ $expected ? $expected : $@ || "";
+    is( $got, $expected, "run [{hash}] croaks with clear reference error" );
+}
+
+SCOPE: {
+    my $expected = 'must be a string, not a CODE';
+    eval { run [sub { 1 }] };
+    my $got = $@ =~ $expected ? $expected : $@ || "";
+    is( $got, $expected, "run [sub{}] croaks with clear reference error" );
 }
 
 SKIP: {
